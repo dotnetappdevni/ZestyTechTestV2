@@ -1,0 +1,63 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using System.Linq;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Home>
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@{
+	Layout = "Master.cshtml";
+}
+
+<h1>@Model.Value("title")</h1>
+
+@Model.Value("body")
+
+
+@{
+    string latitude = "54.607868";
+    string longitude = "-5.926437";
+    string apiUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m";
+
+    using (System.Net.Http.HttpClient httpClient = new System.Net.Http.HttpClient())
+    {
+        try
+        {
+            string apiResponse = await httpClient.GetStringAsync(apiUrl);
+
+            // Deserialize the JSON response
+            dynamic jsonData = Newtonsoft.Json.JsonConvert.DeserializeObject(apiResponse);
+
+            // Access the current temperature
+            double currentTemperature = jsonData?.current?.temperature_2m ?? 0;
+
+            // Access the current wind speed
+            double currentWindSpeed = jsonData?.current?.wind_speed_10m ?? 0;
+
+            var relativeHumidityData = jsonData?.hourly?.relative_humidity_2m;
+
+            var humidityLast5Readings = string.Empty;
+            if (relativeHumidityData != null)
+            {
+                // Convert JArray to List
+                var humidityList = relativeHumidityData.ToObject<List<int>>();
+
+                // Determine the start index to get the last 5 elements
+                int startIndex = Math.Max(0, humidityList.Count - 5);
+
+                // Get the last 5 elements
+                var last5Updates = humidityList.GetRange(startIndex, Math.Min(5, humidityList.Count - startIndex));
+
+                // Correct the variable name here
+                humidityLast5Readings = string.Join(", ", last5Updates);
+            }
+
+            // Display the current temperature
+            <p>Current Temperature: @currentTemperature °C</p>
+            <p>Current WindSpeed: @currentWindSpeed </p>
+            <p>Humidity Last 5 Readings: @humidityLast5Readings </p>
+        }
+        catch (Exception ex)
+        {
+            // Handle any exceptions that may occur during the API request
+            <p>Error occurred: @ex.Message</p>
+        }
+    }
+}

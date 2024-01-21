@@ -1,0 +1,32 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.NewsArticle>
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Cms.Core.Models
+@{
+	Layout = "Master.cshtml";
+}
+
+<h1>@Model.Value("title")</h1>
+ 
+
+@{
+    // Assuming Model.Value("date") returns a DateTime object
+    var dateValue = Model.Value<DateTime>("date");
+}
+<h2>@dateValue.ToString("d MMMM yyyy")</h2>
+
+@{
+    var img = Model.Value<MediaWithCrops>("image");
+
+    @if (img != null && img.HasValue("umbracoFile"))
+    {
+        <img src="@img.MediaUrl()" style="width:200px" />
+    }
+    else
+    {
+        <!-- Placeholder image source -->
+        <img src="https://placehold.co/600x400?text=Image+Not+Found" alt="Image not Found" style="width:200px" />
+    }
+}
+
+@Model.Value("body")

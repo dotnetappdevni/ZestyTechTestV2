@@ -1,0 +1,21 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = null;
+}
+
+<html>
+    <head>
+        <style>
+            * { font-family: arial; } 
+        </style>
+    </head>
+    <body>
+        <nav><strong><a href="/">Home</a> | <a href="/news?page=1">News</a></strong></nav>
+        
+        @RenderBody()
+        
+        <hr/>
+        <footer>&copy; Zesty Tech Test V2</footer>
+    </body>
+</html>
