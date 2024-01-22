@@ -1,15 +1,59 @@
 ﻿@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.StaffListings>
+@using testc= Umbraco.Cms.Web.Common.UmbracoContext;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
 @using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
 @{
     Layout = "Master.cshtml";
 }
 
-<h2>@Model.Content.Name</h2>
 
 @{
+    var pageSize = 10; // Set the number of items per page
+    var currentPage = HttpContextAccessor.HttpContext.Request.Query["page"];
     var items = Umbraco.ContentAtRoot().FirstOrDefault()
-         .DescendantsOfType("staffListings")
+             .DescendantsOfType("staffMember")
              .Where(x => x.IsVisible())
              .OrderByDescending(x => x.CreateDate);
+
+    var totalItems = items.Count();
+    var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+
+
+    var startIndex = (int.Parse(currentPage) - 1) * pageSize;
+    var endIndex = Math.Min(startIndex + pageSize - 1, totalItems - 1);
+
+    var pagedItems = items.Skip(startIndex).Take(pageSize);
+
 }
+
+<!-- Article Content -->
+<ul>
+    @foreach (var item in pagedItems)
+    {
+        var settings = Umbraco.Content(1075);
+     
+        <li>
+            
+            @settings.Value("firstName")  @settings.Value("lastName") <a href="@item.Url()">@item.Name()</a>
+
+        </li>
+
+    }
+</ul>
+
+
+<!-- Pagination Links -->
+@if (totalPages > 1)
+{
+    <h2>Pages</h2>
+    <div class="pagination">
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <a href="?page=@i">@i</a>
+        }
+    </div>
+}
+ 

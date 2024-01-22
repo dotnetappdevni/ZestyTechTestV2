@@ -1,0 +1,49 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.StaffMember>
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Cms.Core.Models
+@{
+    Layout = "Master.cshtml";
+
+    var testModel = Model;
+    var img = Model.Value<MediaWithCrops>("photo");
+    var firstName = Model.Value<string>("firstName");
+    var surName = Model.Value<string>("surName");
+    var dob = (DateTime)Model.Value<DateTime>("DOB");
+    var age = Model.Value<string>("age");
+    var bio = Model.Value<string>("biography"); 
+ 
+
+    var profilePhoto = img?.LocalCrops?.Src;
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <!-- Profile Picture -->
+            @if (profilePhoto != null)
+            {
+                <img src="@profilePhoto" style="width:200px" />
+            }
+            else
+            {
+                <!-- Placeholder image source -->
+                <img src="https://placehold.co/600x400?text=Image+Not+Found" alt="Image not Found" style="width:200px" />
+            }
+        </div>
+        <div class="col-md-8">
+            <!-- Personal Information -->
+            <h2>
+                Name:@firstName @surName
+            </h2>
+            <p>Age:@age</p>
+            <p>Date of Birth:@dob.ToString("d MMMM yyyy")</p>
+
+            <!-- Biography -->
+            <h4>Biography</h4>
+            <p>@Html.Raw(@bio)</p>
+        </div>
+    </div>
+</div>
+
+<a href="/staff-listings?page=1">Back To Staff Listing</a>
